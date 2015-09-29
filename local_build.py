@@ -57,13 +57,19 @@ FIGURE_DEFAULTS = {'placement': '', 'width': '1\columnwidth', 'figure_env': 'fig
 
 
 def get_input_string(filename, localdir, quotepath=True):
-    if filename.endswith('.tex'):
-        filename = filename[:-4]
+    if not filename.endswith('.tex'):
+        filename = filename + '.tex'
     if quotepath:
         quote_chr = '"'
     else:
         quote_chr = ''
-    return r'\input{' + quote_chr + os.path.join(localdir, filename) + quote_chr + '}'
+
+    filepath = os.path.join(localdir, filename)
+    print(filepath)
+    # print(open(filepath).read())
+    return open(filepath).read()
+
+    # return r'\input{' + quote_chr + os.path.join(localdir, filename) + quote_chr + '}'
 
 
 def get_figure_string(filename, localdir):
@@ -178,7 +184,10 @@ def build_authorea_latex(localdir, builddir, latex_exec, bibtex_exec, outname,
                 pass # skip any that have been processed above
             elif ls in ('abstract.tex'):
                 # add abstract to title content
-                titlecontent.append(r'\begin{abstract}' + get_input_string('abstract', get_in_path(localdir, builddir, pathtype))  + '\end{abstract}')
+                abstract_content = '\\begin{abstract}\n'
+                abstract_content += get_input_string('abstract', get_in_path(localdir, builddir, pathtype))
+                abstract_content += '\\end{abstract}'
+                titlecontent.append(abstract_content)
             elif ls.endswith('.html') or ls.endswith('.htm'):
                 pass  # html files aren't latex-able
             elif ls.startswith('figures'):
